@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-900 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IPTV Channels Directory</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Inter Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+  </style>
+</head>
+<body class="h-full flex flex-col font-sans bg-slate-950 text-slate-100 antialiased selection:bg-brand-500 selection:text-white">
+
+  <!-- Notification Toast -->
+  <div id="toast" class="fixed bottom-5 right-5 transform translate-y-20 opacity-0 transition-all duration-300 ease-in-out bg-brand-600 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 z-50 border border-brand-400/30">
+    <i class="fa-solid fa-circle-check text-lg"></i>
+    <span id="toast-message" class="text-sm font-medium">Action completed</span>
+  </div>
+
+  <!-- Header & Navigation -->
+  <header class="sticky top-0 z-40 bg-slate-900/80 backdrop-blur-md border-b border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      <!-- Logo -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-brand-500/20">
+          <i class="fa-solid fa-tv text-xl"></i>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">IPTV Directory</h1>
+          <p class="text-xs text-slate-400 hidden sm:block">Channel Manager & Feeds Explorer</p>
+        </div>
+      </div>
+
+      <!-- Quick Stats & Actions -->
+      <div class="flex items-center gap-3">
+        <div class="hidden md:flex items-center gap-2 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700/50 text-xs text-slate-300">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span id="stat-total">0</span> Channels Available
+        </div>
+        <a href="https://github.com/m3u8-plays/iptv-pro/issues/1#issue-5951972416" target="_blank" rel="noopener noreferrer" class="bg-brand-600 hover:bg-brand-500 text-white px-3.5 py-2 rounded-xl text-sm font-medium transition-all shadow-md hover:shadow-brand-500/25 flex items-center gap-2">
+          <i class="fa-solid fa-plus"></i>
+          <span class="hidden sm:inline">Add Channel</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6">
+
+    <!-- Search & Filter Bar -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xl flex flex-col lg:flex-row gap-4 justify-between items-stretch lg:items-center">
+      
+      <!-- Search Input -->
+      <div class="relative flex-1">
+        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+        <input 
+          type="text" 
+          id="search-input"
+          placeholder="Search by Channel Name or ID (e.g., BBC One, BBCOne.uk)..." 
+          class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-10 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-all"
+          oninput="applyFilters()"
+        >
+        <button id="clear-search" onclick="clearSearch()" class="hidden absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Filters Row -->
+      <div class="flex flex-wrap sm:flex-nowrap items-center gap-3">
+        <!-- Country Filter -->
+        <div class="relative flex-1 sm:w-40">
+          <select id="filter-country" onchange="applyFilters()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-300 focus:outline-none focus:border-brand-500 appearance-none cursor-pointer">
+            <option value="ALL">All Countries</option>
+            <option value="UK">United Kingdom 🇬🇧</option>
+            <option value="US">United States 🇺🇸</option>
+            <option value="CA">Canada 🇨🇦</option>
+          </select>
+          <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs pointer-events-none"></i>
+        </div>
+
+        <!-- Category Filter -->
+        <div class="relative flex-1 sm:w-40">
+          <select id="filter-category" onchange="applyFilters()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-300 focus:outline-none focus:border-brand-500 appearance-none cursor-pointer">
+            <option value="ALL">All Categories</option>
+            <option value="General">General</option>
+            <option value="News">News</option>
+            <option value="Sports">Sports</option>
+            <option value="Entertainment">Entertainment</option>
+          </select>
+          <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs pointer-events-none"></i>
+        </div>
+
+        <!-- Quality Filter -->
+        <div class="relative flex-1 sm:w-36">
+          <select id="filter-quality" onchange="applyFilters()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-300 focus:outline-none focus:border-brand-500 appearance-none cursor-pointer">
+            <option value="ALL">All Qualities</option>
+            <option value="1080i">1080i (HD)</option>
+            <option value="720p">720p (HD)</option>
+            <option value="480i">480i (SD)</option>
+          </select>
+          <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs pointer-events-none"></i>
+        </div>
+
+        <!-- Reset Button -->
+        <button onclick="resetFilters()" title="Reset Filters" class="px-3.5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl border border-slate-700/50 transition-colors text-sm">
+          <i class="fa-solid fa-rotate-left"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Active Filters Badges -->
+    <div id="active-filters-container" class="hidden flex flex-wrap items-center gap-2 px-1">
+      <span class="text-xs text-slate-400 font-medium">Filters:</span>
+      <div id="active-filters-list" class="flex flex-wrap gap-2"></div>
+    </div>
+
+    <!-- Channels Grid -->
+    <div id="channels-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <!-- Dynamic Channel Cards Injected Here -->
+    </div>
+
+    <!-- Empty State -->
+    <div id="empty-state" class="hidden flex-1 flex flex-col items-center justify-center text-center py-16 px-4 bg-slate-900/50 rounded-2xl border border-slate-800">
+      <div class="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center text-slate-500 text-2xl mb-4">
+        <i class="fa-solid fa-tv"></i>
+      </div>
+      <h3 class="text-lg font-semibold text-slate-200">No Channels Found</h3>
+      <p class="text-slate-400 text-sm max-w-sm mt-1 mb-6">We couldn't find any channels matching your current search or filter criteria.</p>
+      <button onclick="resetFilters()" class="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-white rounded-xl text-sm font-medium transition-all">
+        Reset All Filters
+      </button>
+    </div>
+
+  </main>
+
+  <!-- Channel Details Modal -->
+  <div id="details-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-200">
+      <!-- Modal Header -->
+      <div class="p-5 border-b border-slate-800 flex items-center justify-between bg-slate-900/50">
+        <div class="flex items-center gap-3">
+          <div id="modal-logo-container" class="w-12 h-12 rounded-xl bg-slate-950 border border-slate-800 p-1.5 flex items-center justify-center">
+            <img id="modal-logo" src="" alt="" class="max-h-full max-w-full object-contain" onerror="this.src='https://placehold.co/100x100/1e293b/94a3b8?text=TV'">
+          </div>
+          <div>
+            <h2 id="modal-title" class="text-lg font-bold text-white">Channel Details</h2>
+            <p id="modal-id" class="text-xs font-mono text-slate-400">ID: --</p>
+          </div>
+        </div>
+        <button onclick="closeDetailsModal()" class="w-8 h-8 rounded-lg bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition-colors">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-5 space-y-5 overflow-y-auto">
+        <!-- Category & Country Tags -->
+        <div class="flex flex-wrap gap-2 items-center">
+          <span id="modal-category" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-brand-500/10 text-brand-400 border border-brand-500/20">--</span>
+          <span id="modal-country" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 border border-slate-700">--</span>
+        </div>
+
+        <!-- Feed Details Sections -->
+        <div>
+          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Available Feeds & Quality</h4>
+          <div id="modal-feeds-container" class="space-y-3">
+            <!-- Dynamic Feeds inserted here -->
+          </div>
+        </div>
+
+        <!-- Raw Metadata Box -->
+        <div>
+          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Raw Format Snippet</h4>
+          <pre id="modal-raw-snippet" class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs font-mono text-slate-400 overflow-x-auto whitespace-pre-wrap"></pre>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-4 border-t border-slate-800 bg-slate-900/50 flex justify-end gap-3">
+        <button onclick="closeDetailsModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-sm font-medium transition-colors">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="mt-auto border-t border-slate-800 bg-slate-900/50 py-6">
+    <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500">
+      <p>IPTV Data Directory & Feed Explorer &copy; 2026. Built with structured channel metadata.</p>
+    </div>
+  </footer>
+
+  <!-- Application Logic JS -->
+  <script>
+    // Initial Dataset based on provided structure
+    const initialChannels = [
+      {
+        id: "BBCOne.uk",
+        name: "BBC One",
+        number: 1,
+        countryCode: "UK",
+        countryFlag: "🇬🇧",
+        category: "General",
+        logo: "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8b/BBC_One_logo_2021.svg/330px-BBC_One_logo_2021.svg.png?utm_source=es.wikipedia.org&utm_campaign=index&utm_content=thumbnail",
+        feeds: [
+          { type: "SD", countries: ["UK"], quality: "480i" },
+          { type: "HD", countries: ["UK"], quality: "1080i" }
+        ]
+      },
+      {
+        id: "BBCTwo.uk",
+        name: "BBC Two",
+        number: 2,
+        countryCode: "UK",
+        countryFlag: "🇬🇧",
+        category: "General",
+        logo: "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/15/BBC_Two_logo_2021.svg/330px-BBC_Two_logo_2021.svg.png?utm_source=es.wikipedia.org&utm_campaign=index&utm_content=thumbnail",
+        feeds: [
+          { type: "SD", countries: ["UK"], quality: "480i" },
+          { type: "HD", countries: ["UK"], quality: "1080i" }
+        ]
+      }
+    ];
+
+    let channels = [...initialChannels];
+
+    // DOM Elements
+    const channelsGrid = document.getElementById('channels-grid');
+    const emptyState = document.getElementById('empty-state');
+    const searchInput = document.getElementById('search-input');
+    const clearSearchBtn = document.getElementById('clear-search');
+    const filterCountry = document.getElementById('filter-country');
+    const filterCategory = document.getElementById('filter-category');
+    const filterQuality = document.getElementById('filter-quality');
+    const activeFiltersContainer = document.getElementById('active-filters-container');
+    const activeFiltersList = document.getElementById('active-filters-list');
+    const statTotal = document.getElementById('stat-total');
+
+    // Initialize Application
+    window.onload = function() {
+      renderChannels(channels);
+    };
+
+    // Render Channel Cards
+    function renderChannels(data) {
+      channelsGrid.innerHTML = '';
+      statTotal.textContent = data.length;
+
+      if (data.length === 0) {
+        emptyState.classList.remove('hidden');
+        channelsGrid.classList.add('hidden');
+        return;
+      }
+
+      emptyState.classList.add('hidden');
+      channelsGrid.classList.remove('hidden');
+
+      data.forEach(channel => {
+        const card = document.createElement('div');
+        card.className = "bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-2xl p-5 shadow-lg hover:shadow-xl transition-all duration-200 flex flex-col justify-between group";
+        
+        // Quality Badges
+        const qualityBadges = channel.feeds.map(f => {
+          const isHD = f.quality.includes('1080') || f.quality.includes('720');
+          return `<span class="px-2 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase ${isHD ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20' : 'bg-slate-800 text-slate-400 border border-slate-700'}">${f.type} (${f.quality})</span>`;
+        }).join('');
+
+        card.innerHTML = `
+          <div>
+            <!-- Card Header: Flag & ID -->
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 border border-slate-700/60 flex items-center gap-1.5">
+                <span>${channel.countryFlag}</span>
+                <span>${channel.countryCode}</span>
+              </span>
+              <span class="text-xs font-mono text-slate-500 bg-slate-950 px-2 py-1 rounded-md border border-slate-800/80">
+                ${channel.id}
+              </span>
+            </div>
+
+            <!-- Logo & Channel Info -->
+            <div class="flex items-start gap-4 mb-4">
+              <div class="w-16 h-16 rounded-xl bg-slate-950 border border-slate-800/80 p-2 flex items-center justify-center shrink-0 group-hover:border-slate-700 transition-colors">
+                <img 
+                  src="${channel.logo}" 
+                  alt="${channel.name}" 
+                  class="max-h-full max-w-full object-contain"
+                  onerror="this.src='https://placehold.co/100x100/1e293b/94a3b8?text=${encodeURIComponent(channel.name)}'"
+                >
+              </div>
+              <div class="overflow-hidden">
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-bold text-brand-500">#${channel.number}</span>
+                  <h3 class="text-base font-bold text-white truncate group-hover:text-brand-400 transition-colors">${channel.name}</h3>
+                </div>
+                <p class="text-xs text-slate-400 mt-0.5">Category: <span class="text-slate-300 font-medium">${channel.category}</span></p>
+                <div class="flex flex-wrap gap-1.5 mt-2">
+                  ${qualityBadges}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions Footer -->
+          <div class="pt-4 border-t border-slate-800/60 flex items-center justify-between gap-2">
+            <button onclick="copyChannelInfo('${channel.id}')" class="flex-1 py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-medium transition-colors flex items-center justify-center gap-2">
+              <i class="fa-regular fa-copy"></i>
+              <span>Copy Info</span>
+            </button>
+            <button onclick="openDetailsModal('${channel.id}')" class="flex-1 py-2 px-3 rounded-xl bg-brand-600/10 hover:bg-brand-600 text-brand-400 hover:text-white border border-brand-500/20 text-xs font-medium transition-all flex items-center justify-center gap-2">
+              <i class="fa-solid fa-circle-info"></i>
+              <span>Details</span>
+            </button>
+          </div>
+        `;
+        channelsGrid.appendChild(card);
+      });
+    }
+
+    // Filter Logic
+    function applyFilters() {
+      const query = searchInput.value.toLowerCase().trim();
+      const country = filterCountry.value;
+      const category = filterCategory.value;
+      const quality = filterQuality.value;
+
+      // Show/Hide Clear button
+      clearSearchBtn.classList.toggle('hidden', query === '');
+
+      const filtered = channels.filter(ch => {
+        // Search Match
+        const matchesQuery = ch.name.toLowerCase().includes(query) || ch.id.toLowerCase().includes(query);
+        // Country Match
+        const matchesCountry = country === 'ALL' || ch.countryCode === country;
+        // Category Match
+        const matchesCategory = category === 'ALL' || ch.category === category;
+        // Quality Match
+        const matchesQuality = quality === 'ALL' || ch.feeds.some(f => f.quality === quality);
+
+        return matchesQuery && matchesCountry && matchesCategory && matchesQuality;
+      });
+
+      updateActiveBadges(query, country, category, quality);
+      renderChannels(filtered);
+    }
+
+    // Update Active Filters Badges UI
+    function updateActiveBadges(query, country, category, quality) {
+      activeFiltersList.innerHTML = '';
+      let count = 0;
+
+      if (query) {
+        addBadge(`Search: "${query}"`, () => { searchInput.value = ''; applyFilters(); });
+        count++;
+      }
+      if (country !== 'ALL') {
+        addBadge(`Country: ${country}`, () => { filterCountry.value = 'ALL'; applyFilters(); });
+        count++;
+      }
+      if (category !== 'ALL') {
+        addBadge(`Category: ${category}`, () => { filterCategory.value = 'ALL'; applyFilters(); });
+        count++;
+      }
+      if (quality !== 'ALL') {
+        addBadge(`Quality: ${quality}`, () => { filterQuality.value = 'ALL'; applyFilters(); });
+        count++;
+      }
+
+      activeFiltersContainer.classList.toggle('hidden', count === 0);
+    }
+
+    function addBadge(label, onRemove) {
+      const badge = document.createElement('span');
+      badge.className = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-800 text-xs text-brand-400 border border-slate-700";
+      badge.innerHTML = `<span>${label}</span> <i class="fa-solid fa-xmark text-[10px] cursor-pointer hover:text-white"></i>`;
+      badge.querySelector('i').addEventListener('click', onRemove);
+      activeFiltersList.appendChild(badge);
+    }
+
+    function clearSearch() {
+      searchInput.value = '';
+      applyFilters();
+    }
+
+    function resetFilters() {
+      searchInput.value = '';
+      filterCountry.value = 'ALL';
+      filterCategory.value = 'ALL';
+      filterQuality.value = 'ALL';
+      applyFilters();
+    }
+
+    // Modal Details Logic
+    function openDetailsModal(channelId) {
+      const ch = channels.find(c => c.id === channelId);
+      if (!ch) return;
+
+      document.getElementById('modal-title').textContent = ch.name;
+      document.getElementById('modal-id').textContent = `ID: ${ch.id}`;
+      document.getElementById('modal-category').textContent = ch.category;
+      document.getElementById('modal-country').textContent = `${ch.countryFlag} ${ch.countryCode}`;
+      document.getElementById('modal-logo').src = ch.logo;
+
+      // Render Feeds
+      const feedsContainer = document.getElementById('modal-feeds-container');
+      feedsContainer.innerHTML = ch.feeds.map(f => `
+        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <span class="px-2 py-1 rounded text-xs font-bold ${f.type === 'HD' ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20' : 'bg-slate-800 text-slate-400'}">${f.type}</span>
+            <div>
+              <p class="text-xs font-medium text-slate-200">Quality: ${f.quality}</p>
+              <p class="text-[11px] text-slate-500">Countries: ${f.countries.join(', ')}</p>
+            </div>
+          </div>
+          <button onclick="copyToClipboard('${ch.name} [${f.type}] - ID: ${ch.id}')" class="text-xs text-brand-400 hover:text-brand-300 font-medium">
+            Copy Feed
+          </button>
+        </div>
+      `).join('');
+
+      // Render Text Raw Format Snippet
+      const rawText = `${ch.countryCode} ${ch.countryFlag}:\n\n${ch.number}.${ch.name}:\n\nLogo:${ch.logo}\ncategory: ${ch.category}\nID:${ch.id}\nFeed:\n` +
+        ch.feeds.map(f => `${f.type}:\n\nCountries: ${f.countries.join(' ')}\nQuality:${f.quality}`).join('\n\n');
+
+      document.getElementById('modal-raw-snippet').textContent = rawText;
+
+      document.getElementById('details-modal').classList.remove('hidden');
+    }
+
+    function closeDetailsModal() {
+      document.getElementById('details-modal').classList.add('hidden');
+    }
+
+    // Copy to Clipboard Helper
+    function copyChannelInfo(id) {
+      const ch = channels.find(c => c.id === id);
+      if (!ch) return;
+      
+      const text = `${ch.name} (${ch.id}) | Category: ${ch.category} | Country: ${ch.countryCode}`;
+      copyToClipboard(text);
+    }
+
+    function copyToClipboard(text) {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        showToast("Copied to clipboard!");
+      } catch (err) {
+        showToast("Failed to copy text");
+      }
+      document.body.removeChild(textArea);
+    }
+
+    // Toast Notification
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toast-message');
+      toastMsg.textContent = message;
+      
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
