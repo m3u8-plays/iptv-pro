@@ -238,73 +238,73 @@
   <script>
     // Initial Dataset based on provided structure
     const initialChannels = [
-      {
-        id: "BBCOne.uk",
-        name: "BBC One",
-        number: 1,
-        countryCode: "UK",
-        countryFlag: "🇬🇧",
-        category: "General",
-        logo: "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8b/BBC_One_logo_2021.svg/330px-BBC_One_logo_2021.svg.png?utm_source=es.wikipedia.org&utm_campaign=index&utm_content=thumbnail",
-        feeds: [
-          { type: "SD", countries: ["UK"], quality: "480i" },
-          { type: "HD", countries: ["UK"], quality: "1080i" }
-        ]
-      },
-      {
-        id: "BBCTwo.uk",
-        name: "BBC Two",
-        number: 2,
-        countryCode: "UK",
-        countryFlag: "🇬🇧",
-        category: "General",
-        logo: "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/15/BBC_Two_logo_2021.svg/330px-BBC_Two_logo_2021.svg.png?utm_source=es.wikipedia.org&utm_campaign=index&utm_content=thumbnail",
-        feeds: [
-          { type: "SD", countries: ["UK"], quality: "480i" },
-          { type: "HD", countries: ["UK"], quality: "1080i" }
-        ]
-      },
-      {
-        id: "BBCThree.uk",
-        name: "BBC Three",
-        number: 3,
-        countryCode: "UK",
-        countryFlag: "🇬🇧",
-        category: "General",
-        logo: "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/76/BBC_Three_2022.svg/960px-BBC_Three_2022.svg.png?utm_source=es.wikipedia.org&utm_campaign=index&utm_content=thumbnail",
-        feeds: [
-          { type: "SD", countries: ["UK"], quality: "480i" },
-          { type: "HD", countries: ["UK"], quality: "1080i" }
-        ]
-      },
-      {
-        id: "FOX.us",
-        name: "FOX",
-        number: 4,
-        countryCode: "US",
-        countryFlag: "🇺🇸",
-        category: "General",
-        logo: "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/25/FOX_wordmark.svg/3840px-FOX_wordmark.svg.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=thumbnail",
-        feeds: [
-          { type: "SD", countries: ["US"], quality: "480i" },
-          { type: "WCVB-TV", countries: ["US"], quality: "480i" }
-          { type: "WXNE-TV", countries: ["US"], quality: "480i" }
-        ]
-      },
-      {
-        id: "NBC.us",
-        name: "NBC",
-        number: 5,
-        countryCode: "US",
-        countryFlag: "🇺🇸",
-        category: "General",
-        logo: "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3f/NBC_logo.svg/3840px-NBC_logo.svg.png?utm_source=es.wikipedia.org&utm_campaign=index&utm_content=thumbnail",
-        feeds: [
-          { type: "SD", countries: ["US"], quality: "480i" },
-          { type: "WNBC", countries: ["US"], quality: "480i" }
-        ]
-      }
-    ];
+  {
+    id: "BBCOne.uk",
+    name: "BBC One",
+    number: 1,
+    countryCode: "UK",
+    countryFlag: "🇬🇧",
+    category: "General",
+    logo: "https://thumb.wikimedia.org/.../BBC_One_logo_2021.svg.png",
+    feeds: [
+      { type: "SD", countries: ["UK"], quality: "480i" },
+      { type: "HD", countries: ["UK"], quality: "1080i" }
+    ]
+  },
+  {
+    id: "BBCTwo.uk",
+    name: "BBC Two",
+    number: 2,
+    countryCode: "UK",
+    countryFlag: "🇬🇧",
+    category: "General",
+    logo: "https://thumb.wikimedia.org/.../BBC_Two_logo_2021.svg.png",
+    feeds: [
+      { type: "SD", countries: ["UK"], quality: "480i" },
+      { type: "HD", countries: ["UK"], quality: "1080i" }
+    ]
+  },
+  {
+    id: "BBCThree.uk",
+    name: "BBC Three",
+    number: 3,
+    countryCode: "UK",
+    countryFlag: "🇬🇧",
+    category: "General",
+    logo: "https://thumb.wikimedia.org/.../BBC_Three_2022.svg.png",
+    feeds: [
+      { type: "SD", countries: ["UK"], quality: "480i" },
+      { type: "HD", countries: ["UK"], quality: "1080i" }
+    ]
+  },
+  {
+    id: "FOX.us",
+    name: "FOX",
+    number: 4,
+    countryCode: "US",
+    countryFlag: "🇺🇸",
+    category: "General",
+    logo: "https://thumb.wikimedia.org/.../FOX_wordmark.svg.png",
+    feeds: [
+      { type: "SD", countries: ["US"], quality: "480i" },
+      { type: "WCVB-TV", countries: ["US"], quality: "480i" },
+      { type: "WXNE-TV", countries: ["US"], quality: "480i" }
+    ]
+  },
+  {
+    id: "NBC.us",
+    name: "NBC",
+    number: 5,
+    countryCode: "US",
+    countryFlag: "🇺🇸",
+    category: "General",
+    logo: "https://thumb.wikimedia.org/.../NBC_logo.svg.png",
+    feeds: [
+      { type: "SD", countries: ["US"], quality: "480i" },
+      { type: "WNBC", countries: ["US"], quality: "480i" }
+    ]
+  }
+];
 
     let channels = [...initialChannels];
 
