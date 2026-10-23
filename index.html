@@ -278,7 +278,7 @@
       {
         id: "FOX.us",
         name: "FOX",
-        number: 2,
+        number: 4,
         countryCode: "US",
         countryFlag: "🇺🇸",
         category: "General",
@@ -290,6 +290,18 @@
         ]
       },
       {
+        id: "NBC.us",
+        name: "NBC",
+        number: 5,
+        countryCode: "US",
+        countryFlag: "🇺🇸",
+        category: "General",
+        logo: "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3f/NBC_logo.svg/3840px-NBC_logo.svg.png?utm_source=es.wikipedia.org&utm_campaign=index&utm_content=thumbnail",
+        feeds: [
+          { type: "SD", countries: ["US"], quality: "480i" },
+          { type: "WNBC", countries: ["US"], quality: "480i" }
+        ]
+      }
     ];
 
     let channels = [...initialChannels];
