@@ -10,8 +10,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Inter Font -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <!-- HLS.js for direct stream playback -->
-  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -99,7 +97,7 @@
         <input 
           type="text" 
           id="search-input"
-          placeholder="Search by Channel Name or ID (e.g., NBC, BBCOne.uk)..." 
+          placeholder="Search by Channel Name or ID (e.g., BBC One, BBCOne.uk)..." 
           class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-10 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-all"
           oninput="applyFilters()"
         >
@@ -125,9 +123,7 @@
           <select id="filter-category" onchange="applyFilters()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-300 focus:outline-none focus:border-brand-500 appearance-none cursor-pointer">
             <option value="ALL">All Categories</option>
             <option value="General">General</option>
-            <option value="News">News</option>
-            <option value="Sports">Sports</option>
-            <option value="Entertainment">Entertainment</option>
+            <option value="Undefined">Undefined</option>
           </select>
           <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs pointer-events-none"></i>
         </div>
@@ -137,7 +133,6 @@
           <select id="filter-quality" onchange="applyFilters()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-300 focus:outline-none focus:border-brand-500 appearance-none cursor-pointer">
             <option value="ALL">All Qualities</option>
             <option value="1080i">1080i (HD)</option>
-            <option value="720p">720p (HD)</option>
             <option value="480i">480i (SD)</option>
           </select>
           <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs pointer-events-none"></i>
@@ -177,7 +172,7 @@
 
   <!-- Channel Details Modal -->
   <div id="details-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-200">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in fade-in zoom-in duration-200">
       <!-- Modal Header -->
       <div class="p-5 border-b border-slate-800 flex items-center justify-between bg-slate-900/50">
         <div class="flex items-center gap-3">
@@ -204,7 +199,7 @@
 
         <!-- Feed Details Sections -->
         <div>
-          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Available Feeds & Transmissions</h4>
+          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Available Feeds & Quality</h4>
           <div id="modal-feeds-container" class="space-y-3">
             <!-- Dynamic Feeds inserted here -->
           </div>
@@ -212,13 +207,8 @@
 
         <!-- Raw Metadata Box -->
         <div>
-          <div class="flex items-center justify-between mb-2">
-            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Raw Format Snippet</h4>
-            <button onclick="copyRawSnippet()" class="text-xs text-brand-400 hover:text-brand-300 font-medium flex items-center gap-1">
-              <i class="fa-regular fa-copy"></i> Copy Raw Text
-            </button>
-          </div>
-          <pre id="modal-raw-snippet" class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs font-mono text-slate-300 overflow-x-auto whitespace-pre-wrap select-all max-h-48 scrollbar-thin"></pre>
+          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Raw Format Snippet</h4>
+          <pre id="modal-raw-snippet" class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs font-mono text-slate-400 overflow-x-auto whitespace-pre-wrap"></pre>
         </div>
       </div>
 
@@ -227,28 +217,6 @@
         <button onclick="closeDetailsModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-sm font-medium transition-colors">
           Close
         </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Video Player Player Modal -->
-  <div id="player-modal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-3xl shadow-2xl overflow-hidden flex flex-col">
-      <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900">
-        <div class="flex items-center gap-2">
-          <i class="fa-solid fa-circle-play text-brand-500"></i>
-          <h3 id="player-title" class="text-sm font-bold text-white">Stream Preview</h3>
-        </div>
-        <button onclick="closePlayerModal()" class="w-8 h-8 rounded-lg bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition-colors">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-      <div class="relative bg-black aspect-video flex items-center justify-center">
-        <video id="video-player" controls class="w-full h-full"></video>
-      </div>
-      <div class="p-3 bg-slate-950 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
-        <span id="player-status" class="truncate max-w-md">Connecting to HLS stream...</span>
-        <button onclick="closePlayerModal()" class="text-slate-400 hover:text-white">Close Player</button>
       </div>
     </div>
   </div>
@@ -262,109 +230,107 @@
 
   <!-- Application Logic JS -->
   <script>
-    // Initial Dataset with 5 complete channels, including NBC.us transmission link
+    // Dataset containing all channels
     const initialChannels = [
-  {
-    id: "BBCOne.uk",
-    name: "BBC One",
-    number: 1,
-    countryCode: "UK",
-    countryFlag: "🇬🇧",
-    category: "General",
-    logo: "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8b/BBC_One_logo_2021.svg/330px-BBC_One_logo_2021.svg.png?utm_source=es.wikipedia.org&utm_campaign=index&utm_content=thumbnail",
-    feeds: [
-      { type: "SD", countries: ["UK"], quality: "480i" },
-      { type: "HD", countries: ["UK"], quality: "1080i" }
-    ]
-  },
-  {
-    id: "BBCTwo.uk",
-    name: "BBC Two",
-    number: 2,
-    countryCode: "UK",
-    countryFlag: "🇬🇧",
-    category: "General",
-    logo: "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/15/BBC_Two_logo_2021.svg/330px-BBC_Two_logo_2021.svg.png?utm_source=es.wikipedia.org&utm_campaign=index&utm_content=thumbnail",
-    feeds: [
-      { type: "SD", countries: ["UK"], quality: "480i" },
-      { type: "HD", countries: ["UK"], quality: "1080i" }
-    ]
-  },
-  {
-    id: "BBCThree.uk",
-    name: "BBC Three",
-    number: 3,
-    countryCode: "UK",
-    countryFlag: "🇬🇧",
-    category: "General",
-    logo: "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/76/BBC_Three_2022.svg/960px-BBC_Three_2022.svg.png?utm_source=es.wikipedia.org&utm_campaign=index&utm_content=thumbnail",
-    feeds: [
-      { type: "SD", countries: ["UK"], quality: "480i" },
-      { type: "HD", countries: ["UK"], quality: "1080i" }
-    ]
-  },
-  {
-    id: "FOX.us",
-    name: "FOX",
-    number: 4,
-    countryCode: "US",
-    countryFlag: "🇺🇸",
-    category: "General",
-    logo: "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/25/FOX_wordmark.svg/3840px-FOX_wordmark.svg.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=thumbnail",
-    feeds: [
-      { type: "SD", countries: ["US"], quality: "480i" },
-      { type: "WCVB-TV", countries: ["US"], quality: "480i" },
-      { type: "WXNE-TV", countries: ["US"], quality: "480i" }
-    ]
-  },
-  {
-    id: "NBC.us",
-    name: "NBC",
-    number: 5,
-    countryCode: "US",
-    countryFlag: "🇺🇸",
-    category: "General",
-    logo: "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3f/NBC_logo.svg/3840px-NBC_logo.svg.png?utm_source=es.wikipedia.org&utm_campaign=index&utm_content=thumbnail",
-    feeds: [
-      { type: "SD", countries: ["US"], quality: "480i" },
-      { 
-        type: "WNBC", 
-        countries: ["US"], 
-        quality: "480i",
-        transmission: "https://d368vp0qqzvkid.cloudfront.net/11603/88889709/hls/master.m3u8?ads.xumo_channelId=88889709a&ads.xumo_ifaType=&ads.xumo_providerId=3816&ads.xumo_pro"
+      {
+        id: "BBCOne.uk",
+        name: "BBC One",
+        number: 1,
+        countryCode: "UK",
+        countryFlag: "🇬🇧",
+        category: "General",
+        logo: "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8b/BBC_One_logo_2021.svg/330px-BBC_One_logo_2021.svg.png?utm_source=es.wikipedia.org&utm_campaign=index&utm_content=thumbnail",
+        feeds: [
+          { type: "SD", countries: ["UK"], quality: "480i" },
+          { type: "HD", countries: ["UK"], quality: "1080i" }
+        ]
+      },
+      {
+        id: "BBCTwo.uk",
+        name: "BBC Two",
+        number: 2,
+        countryCode: "UK",
+        countryFlag: "🇬🇧",
+        category: "General",
+        logo: "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/15/BBC_Two_logo_2021.svg/330px-BBC_Two_logo_2021.svg.png?utm_source=es.wikipedia.org&utm_campaign=index&utm_content=thumbnail",
+        feeds: [
+          { type: "SD", countries: ["UK"], quality: "480i" },
+          { type: "HD", countries: ["UK"], quality: "1080i" }
+        ]
+      },
+      {
+        id: "BBCThree.uk",
+        name: "BBC Three",
+        number: 3,
+        countryCode: "UK",
+        countryFlag: "🇬🇧",
+        category: "General",
+        logo: "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/76/BBC_Three_2022.svg/960px-BBC_Three_2022.svg.png?utm_source=es.wikipedia.org&utm_campaign=index&utm_content=thumbnail",
+        feeds: [
+          { type: "SD", countries: ["UK"], quality: "480i" },
+          { type: "HD", countries: ["UK"], quality: "1080i" }
+        ]
+      },
+      {
+        id: "DishChannel100.us",
+        name: "Dish Channel 100",
+        number: 6,
+        countryCode: "US",
+        countryFlag: "🇺🇸",
+        category: "Undefined",
+        logo: "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1e/Dish_Network_logo_2012.svg/3840px-Dish_Network_logo_2012.svg.png?utm_source=es.wikipedia.org&utm_campaign=index&utm_content=thumbnail",
+        feeds: [
+          { type: "SD", countries: ["US"], quality: "480i" }
+        ]
+      },
+      {
+        id: "DishChannel101.us",
+        name: "Dish Channel 101",
+        number: 7,
+        countryCode: "US",
+        countryFlag: "🇺🇸",
+        category: "Undefined",
+        logo: "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1e/Dish_Network_logo_2012.svg/3840px-Dish_Network_logo_2012.svg.png?utm_source=es.wikipedia.org&utm_campaign=index&utm_content=thumbnail",
+        feeds: [
+          { type: "SD", countries: ["US"], quality: "480i" }
+        ]
+      },
+      {
+        id: "FOX.us",
+        name: "FOX",
+        number: 4,
+        countryCode: "US",
+        countryFlag: "🇺🇸",
+        category: "General",
+        logo: "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/25/FOX_wordmark.svg/3840px-FOX_wordmark.svg.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=thumbnail",
+        feeds: [
+          { type: "SD", countries: ["US"], quality: "480i" },
+          { type: "WCVB-TV", countries: ["US"], quality: "480i" },
+          { type: "WXNE-TV", countries: ["US"], quality: "480i" }
+        ]
+      },
+      {
+        id: "NBC.us",
+        name: "NBC",
+        number: 5,
+        countryCode: "US",
+        countryFlag: "🇺🇸",
+        category: "General",
+        logo: "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3f/NBC_logo.svg/3840px-NBC_logo.svg.png?utm_source=es.wikipedia.org&utm_campaign=index&utm_content=thumbnail",
+        feeds: [
+          { type: "SD", countries: ["US"], quality: "480i" },
+          { 
+            type: "WNBC", 
+            countries: ["US"], 
+            quality: "480i",
+            transmission: "https://d368vp0qqzvkid.cloudfront.net/11603/88889709/hls/master.m3u8?ads.xumo_channelId=88889709a&ads.xumo_ifaType=&ads.xumo_providerId=3816&ads.xumo_pro"
+          }
+        ]
       }
-    ]
-  },
-  {
-    id: "DishChannel100.us",
-    name: "Dish Channel 100",
-    number: 6,
-    countryCode: "US",
-    countryFlag: "🇺🇸",
-    category: "Undefined",
-    logo: "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1e/Dish_Network_logo_2012.svg/3840px-Dish_Network_logo_2012.svg.png?utm_source=es.wikipedia.org&utm_campaign=index&utm_content=thumbnail",
-    feeds: [
-      { type: "SD", countries: ["US"], quality: "480i" }
-    ]
-  },
-  {
-    id: "DishChannel101.us",
-    name: "Dish Channel 101",
-    number: 7,
-    countryCode: "US",
-    countryFlag: "🇺🇸",
-    category: "Undefined",
-    logo: "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1e/Dish_Network_logo_2012.svg/3840px-Dish_Network_logo_2012.svg.png?utm_source=es.wikipedia.org&utm_campaign=index&utm_content=thumbnail",
-    feeds: [
-      { type: "SD", countries: ["US"], quality: "480i" }
-    ]
-  }
-];
+    ];
 
-// Automatic A-to-Z Sorting
-let channels = [...initialChannels].sort((a, b) => a.name.localeCompare(b.name));
-    let channels = [...initialChannels];
-    let hlsInstance = null;
+    // Sorted strictly from A to Z
+    let channels = [...initialChannels].sort((a, b) => a.name.localeCompare(b.name));
 
     // DOM Elements
     const channelsGrid = document.getElementById('channels-grid');
@@ -401,16 +367,10 @@ let channels = [...initialChannels].sort((a, b) => a.name.localeCompare(b.name))
         const card = document.createElement('div');
         card.className = "bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-2xl p-5 shadow-lg hover:shadow-xl transition-all duration-200 flex flex-col justify-between group";
         
-        // Quality & Live Badges
+        // Quality Badges
         const qualityBadges = channel.feeds.map(f => {
           const isHD = f.quality.includes('1080') || f.quality.includes('720');
-          const hasStream = !!f.transmissionUrl;
-          return `
-            <span class="px-2 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase inline-flex items-center gap-1 ${isHD ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20' : 'bg-slate-800 text-slate-400 border border-slate-700'}">
-              ${f.type} (${f.quality})
-              ${hasStream ? '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" title="Live Transmission Available"></span>' : ''}
-            </span>
-          `;
+          return `<span class="px-2 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase ${isHD ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20' : 'bg-slate-800 text-slate-400 border border-slate-700'}">${f.type} (${f.quality})</span>`;
         }).join('');
 
         card.innerHTML = `
@@ -438,7 +398,6 @@ let channels = [...initialChannels].sort((a, b) => a.name.localeCompare(b.name))
               </div>
               <div class="overflow-hidden">
                 <div class="flex items-center gap-2">
-                  <span class="text-xs font-bold text-brand-500">#${channel.number}</span>
                   <h3 class="text-base font-bold text-white truncate group-hover:text-brand-400 transition-colors">${channel.name}</h3>
                 </div>
                 <p class="text-xs text-slate-400 mt-0.5">Category: <span class="text-slate-300 font-medium">${channel.category}</span></p>
@@ -487,6 +446,7 @@ let channels = [...initialChannels].sort((a, b) => a.name.localeCompare(b.name))
       renderChannels(filtered);
     }
 
+    // Dynamic Filter Badges
     function updateActiveBadges(query, country, category, quality) {
       activeFiltersList.innerHTML = '';
       let count = 0;
@@ -545,57 +505,39 @@ let channels = [...initialChannels].sort((a, b) => a.name.localeCompare(b.name))
 
       // Render Feeds
       const feedsContainer = document.getElementById('modal-feeds-container');
-      feedsContainer.innerHTML = ch.feeds.map(f => {
-        const streamBlock = f.transmissionUrl ? `
-          <div class="mt-2.5 pt-2 border-t border-slate-800/80">
-            <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-400 block mb-1">
-              <i class="fa-solid fa-tower-broadcast mr-1"></i> Transmission Stream URL
-            </span>
-            <div class="bg-slate-900 border border-slate-800 rounded-lg p-2 flex items-center justify-between gap-2 overflow-hidden">
-              <code class="text-[11px] font-mono text-emerald-300 truncate flex-1">${f.transmissionUrl}</code>
-              <div class="flex items-center gap-1.5 shrink-0">
-                <button onclick="copyToClipboard('${f.transmissionUrl}')" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-[11px] font-medium text-slate-200 transition-colors flex items-center gap-1" title="Copy Stream URL">
-                  <i class="fa-regular fa-copy text-xs"></i> Copy
-                </button>
-                <button onclick="playStream('${f.transmissionUrl}', '${ch.name} (${f.type})')" class="px-2 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-[11px] font-medium text-white transition-colors flex items-center gap-1" title="Play HLS Stream">
-                  <i class="fa-solid fa-play text-xs"></i> Play
+      feedsContainer.innerHTML = ch.feeds.map(f => `
+        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-2">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <span class="px-2 py-1 rounded text-xs font-bold ${f.type === 'HD' ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20' : 'bg-slate-800 text-slate-400'}">${f.type}</span>
+              <div>
+                <p class="text-xs font-medium text-slate-200">Quality: ${f.quality}</p>
+                <p class="text-[11px] text-slate-500">Countries: ${f.countries.join(', ')}</p>
+              </div>
+            </div>
+            <button onclick="copyToClipboard('${ch.name} [${f.type}] - ID: ${ch.id}')" class="text-xs text-brand-400 hover:text-brand-300 font-medium px-2 py-1 bg-slate-900 rounded-lg border border-slate-800">
+              Copy Feed
+            </button>
+          </div>
+          ${f.transmission ? `
+            <div class="mt-2 pt-2 border-t border-slate-800/80 flex flex-col gap-1">
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Transmission Stream:</span>
+              <div class="flex items-center gap-2">
+                <input type="text" readonly value="${f.transmission}" class="flex-1 bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1 text-[11px] text-emerald-400 font-mono truncate focus:outline-none">
+                <button onclick="copyToClipboard('${f.transmission}')" class="bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white border border-emerald-500/30 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors flex items-center gap-1">
+                  <i class="fa-regular fa-copy"></i> Copy
                 </button>
               </div>
             </div>
-          </div>
-        ` : '';
+          ` : ''}
+        </div>
+      `).join('');
 
-        return `
-          <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-3">
-                <span class="px-2 py-1 rounded text-xs font-bold ${f.type === 'HD' ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20' : 'bg-slate-800 text-slate-400'}">${f.type}</span>
-                <div>
-                  <p class="text-xs font-medium text-slate-200">Quality: ${f.quality}</p>
-                  <p class="text-[11px] text-slate-500">Countries: ${f.countries.join(', ')}</p>
-                </div>
-              </div>
-              <button onclick="copyToClipboard('${ch.name} [${f.type}] - ID: ${ch.id}')" class="text-xs text-brand-400 hover:text-brand-300 font-medium">
-                Copy Feed Info
-              </button>
-            </div>
-            ${streamBlock}
-          </div>
-        `;
-      }).join('');
+      // Snippet Text Representation
+      const rawText = `${ch.countryCode} ${ch.countryFlag}:\n\n${ch.name}:\n\nLogo:${ch.logo}\ncategory: ${ch.category}\nID:${ch.id}\nFeed:\n` +
+        ch.feeds.map(f => `${f.type}:\n\nCountries: ${f.countries.join(' ')}\nQuality:${f.quality}${f.transmission ? `\nTransmission:${f.transmission}` : ''}`).join('\n\n');
 
-      // Generate Raw Format Snippet according to structured format
-      let rawText = `${ch.countryCode} ${ch.countryFlag}:\n\n${ch.number}.${ch.name}:\n\nLogo:${ch.logo}\ncategory: ${ch.category}\nID:${ch.id}\nFeed:\n`;
-      
-      ch.feeds.forEach(f => {
-        rawText += `${f.type}:\n`;
-        if (f.transmissionUrl) {
-          rawText += `Transmission:${f.transmissionUrl}\n`;
-        }
-        rawText += `Countries: ${f.countries.join(' ')}\nQuality:${f.quality}\n\n`;
-      });
-
-      document.getElementById('modal-raw-snippet').textContent = rawText.trim();
+      document.getElementById('modal-raw-snippet').textContent = rawText;
       document.getElementById('details-modal').classList.remove('hidden');
     }
 
@@ -603,62 +545,7 @@ let channels = [...initialChannels].sort((a, b) => a.name.localeCompare(b.name))
       document.getElementById('details-modal').classList.add('hidden');
     }
 
-    function copyRawSnippet() {
-      const rawText = document.getElementById('modal-raw-snippet').textContent;
-      copyToClipboard(rawText);
-    }
-
-    // Stream Playback Logic using HLS.js
-    function playStream(url, streamName) {
-      const modal = document.getElementById('player-modal');
-      const video = document.getElementById('video-player');
-      const title = document.getElementById('player-title');
-      const status = document.getElementById('player-status');
-
-      title.textContent = `Live Stream: ${streamName}`;
-      status.textContent = `Loading: ${url}`;
-      modal.classList.remove('hidden');
-
-      if (Hls.isSupported()) {
-        if (hlsInstance) {
-          hlsInstance.destroy();
-        }
-        hlsInstance = new Hls();
-        hlsInstance.loadSource(url);
-        hlsInstance.attachMedia(video);
-        hlsInstance.on(Hls.Events.MANIFEST_PARSED, function() {
-          video.play().catch(() => {});
-          status.textContent = `Streaming active`;
-        });
-        hlsInstance.on(Hls.Events.ERROR, function(event, data) {
-          if (data.fatal) {
-            status.textContent = `Playback error or stream CORS restricted. Direct URL available to copy.`;
-          }
-        });
-      } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = url;
-        video.addEventListener('loadedmetadata', function() {
-          video.play().catch(() => {});
-          status.textContent = `Streaming active`;
-        });
-      } else {
-        status.textContent = `HLS playback not supported natively in this browser.`;
-      }
-    }
-
-    function closePlayerModal() {
-      const modal = document.getElementById('player-modal');
-      const video = document.getElementById('video-player');
-      video.pause();
-      video.src = '';
-      if (hlsInstance) {
-        hlsInstance.destroy();
-        hlsInstance = null;
-      }
-      modal.classList.add('hidden');
-    }
-
-    // Copy to Clipboard Helper
+    // Helper Copy Function
     function copyChannelInfo(id) {
       const ch = channels.find(c => c.id === id);
       if (!ch) return;
@@ -681,7 +568,7 @@ let channels = [...initialChannels].sort((a, b) => a.name.localeCompare(b.name))
       document.body.removeChild(textArea);
     }
 
-    // Toast Notification
+    // Toast Functionality
     function showToast(message) {
       const toast = document.getElementById('toast');
       const toastMsg = document.getElementById('toast-message');
